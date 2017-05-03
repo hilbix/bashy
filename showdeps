@@ -2,14 +2,13 @@
 
 export LC_ALL=C.UTF-8
 
-OOPS() { { printf 'OOPS:'; printf ' %q' "$@"; printf '\n'; } >&2; exit 23; }
-
 showdep()
 {
 export PKG="$1"
 gawk '
 NR==1,/^Dependencies:/	{ next }
 /^Provides:/,0		{ next }
+END	{ if (NR==0) { print "No input, package " ENVIRON["PKG"] " not found?"; exit(1); } }
 
 BEGIN	{
 	OP[0]	= "";
