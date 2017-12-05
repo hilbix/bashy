@@ -2,4 +2,9 @@
 
 Various bash scripts
 
-- `showdeps package..` has a similar output as `apt-cache depends package`, but annotates it with the dependency details (version restrictions).
+The scripts are sorted below `.src/` folder which contains all scripts in, hopefully, reusable packages.
+Each package is a separate branch of this repository here.
+Each branch might contain a separate README.md with short explanation.
+
+The rest here are softlinks, pointing to the scripts etc.
+
