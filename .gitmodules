@@ -1,0 +1,6 @@
+[submodule ".src/debian"]
+	path = .src/debian
+	url = ./
+[submodule ".src/inc"]
+	path = .src/inc
+	url = ./
