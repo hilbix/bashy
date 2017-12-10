@@ -18,7 +18,7 @@ BEGIN	{
 	OP[4]	= ">>";
 	OP[5]	= "==";
 	OP[6]	= "!=";
-	for (a in OP) OP[a+16]=OP[a];
+	for (a in OP) OP[a+16]="|| " OP[a];
 	}
 
 {
