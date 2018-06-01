@@ -67,7 +67,7 @@ N() { o "$@"; NOTE "$@"; }				# "N command args.." noted o
 # V VAR VAL LOCAL..: set VAR to VAL, taking back "local LOCAL..", not affecting $?
 U() { unset -v "$@"; }
 V() { set -- $? "$@"; U "${@:4}"; printf -v "$2" "%s" "$3"; return $1; }	# see http://wiki.bash-hackers.org/commands/builtin/unset#unset2
-v() { local v; v="$(U v; "${@:2}")" || UNLESS x "$2" OOPS fail $?: "${@:2}"; V "$1" "$v" v; }
+v() { local v; v="$(U v; "${@:2}"; STDOUT dummy)" || UNLESS x "$2" OOPS fail $?: "${@:2}"; v="${v%"${_BOILER_PREFIX_}dummy"}"; V "$1" "${v%$'\n'}" v; }
 
 # Simple tests
 _isALPHA() { case "$1" in '') return 1;; (*[^A-Z]*) return 1;; esac; return 0; }
