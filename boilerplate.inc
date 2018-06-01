@@ -2,10 +2,10 @@
 # BASH boilerplate.  Adopt and change as needed.
 #
 # Suggested use:
-# . "$(dirname "$(readlink -e -- "$0")")/boilerplate.inc)" ''
+# . "$(dirname "$(readlink -e -- "$0")")/boilerplate.inc)" '' || exit
 #
 # Give variable-name-prefix, output prefix and output-suffix as args, like
-# . "$(dirname "$(readlink -e -- "$0")")/boilerplate.inc)" 'myflags' '#OUTPUT# ' ''
+# . "$(dirname "$(readlink -e -- "$0")")/boilerplate.inc)" 'myflags' '#OUTPUT# ' '' || exit
 # myflagsdebug=1
 #
 # This Works is placed under the terms of the Copyright Less License,
