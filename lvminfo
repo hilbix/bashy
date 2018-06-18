@@ -1,0 +1,44 @@
+#!/bin/bash
+
+export LC_ALL=C.UTF-8
+
+pvdisplay -md --units B -- "$@" |
+
+awk -v VERBOSE="$1" '
+BEGIN	{ IGNORECASE=1 }
+
+{ gsub(/^[[:space:]]*/,"") }
+
+function out(a,b)
+{
+  if (VERBOSE)
+    printf("%-45s %8s %8s %8s %8s %s %-10s %s %14s %9s %s %s %8s %8s %8s\n", lv, a, b, pa, pb, vgname, pvname, uuid, pvsize, pvwaste, alloc, pesize, petotal, pefree, pealloc);
+  else
+    printf("%-45s %8s %8s %8s %8s %s %-10s\n", lv, a, b, pa, pb, vgname, pvname);
+}
+
+A==0  && NF==4 && /--- physical volume ---/		{ A=1; next }
+A==1  && NF==3 && $1=="pv" && $2=="name"		{ A++; pvname=$3; next }
+A==2  && NF==3 && $1=="vg" && $2=="name"		{ A++; vgname=$3; next }
+A==3  && NF==9 && $1=="pv" && $2=="size" && $4=="B" && $5=="/" && $6=="not" && $7=="usable" && $9=="B"	{ A++; pvsize=$3; pvwaste=$8; next }
+A==4  && NF==2 && $1=="allocatable"			{ A++; alloc=$2; next }
+A==5  && NF==4 && $1=="pe" && $2=="size" && $4=="B"	{ A++; pesize=$3; next }
+A==6  && NF==3 && $1=="total" && $2=="pe"		{ A++; petotal=$3; next }
+A==7  && NF==3 && $1=="free" && $2=="pe"		{ A++; pefree=$3; next }
+A==8  && NF==3 && $1=="allocated" && $2=="pe"		{ A++; pealloc=$3; next }
+A==9  && NF==3 && $1=="pv" && $2=="uuid"		{ A++; uuid=$3; next }
+A==10 && NF==0 && $0==""				{ next }
+A==10 && NF==4 && /--- physical segments ---/		{ A++; next }
+A==11 && NF==5 && $1=="physical" && $2=="extent" && $4=="to" && $5~/:$/		{ A++; sub(/:/,"",$5); pa=$3; pb=$5; next }
+A==11 && NF==0 && $0==""				{ A=0; next }
+A==12 && NF==1 && $1=="FREE"				{ A=11; lv="-"; out("-","-"); next; }
+A==12 && NF==3 && $1=="logical" && $2=="volume"		{ A++;  lv=$3; next; }
+A==13 && NF==5 && $1=="logical" && $2=="extents" && $4=="to"	{ A=11; out($3, $5); next }
+
+	{ printf "%3d %2d | %-11s | %-8s | %-38s | %-3s | %-8s | %-3s | %-6s | %-8s | %-1s |%s|%s|\n", A, NF, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $0; exit(1) }
+
+END	{
+	for (a in x)
+		printf("%s=%s\n", a, x[a]);
+	}
+'
