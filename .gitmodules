@@ -4,3 +4,7 @@
 [submodule ".src/inc"]
 	path = .src/inc
 	url = ./
+[submodule ".src/lvm"]
+	path = .src/lvm
+	url = ./
+	branch = lvm
