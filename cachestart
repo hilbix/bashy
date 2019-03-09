@@ -1,0 +1,69 @@
+#!/bin/bash
+# Bash value caching - for long running interruptible scripts
+#
+# Create cachedir /run/user/${USER:-$LOGNAME}/cache/$$/ and start caching:
+#	cachestart [shell]
+# To end caching session, just do "exit"
+#
+# In scripts (do not use variables starting with __CACHE__):
+#
+# . cachestart
+# cacheC var cmd args..
+# cacheT var token cmd args..
+#
+# cacheV is cached on cmd and args,
+# cacheT (token) is only cached on token.
+#
+# $var is the cached value.
+# Note that only successful cmd runs are cached.
+
+if [ ".$0" = ".$BASH_SOURCE" ]
+then
+	export __CACHE__CACHE__="/run/user/`id -u`/cache/$$.cache"
+	mkdir -pm700 "${__CACHE__CACHE__%/*}"
+	echo 'declare -A __CACHE__C;' >"$__CACHE__CACHE__"
+	trap 'rm -f "$__CACHE__CACHE__"' 0
+	"${@:-"$SHELL"}"
+	exit $?	# executes trap
+fi
+
+[ -n "$__CACHE__CACHE__" ] && [ -s "$__CACHE__CACHE__" ] && . "$__CACHE__CACHE__"
+
+__CACHE__R()
+{
+local -n __CACHE__v="$2"
+
+[ -n "${__CACHE__C["$1"]+_}" ] && { __CACHE__v="${__CACHE__C["$1"]}"; return; }
+__CACHE__v="$("${@:3}")" || return
+__CACHE__C["$1"]="$__CACHE__v"
+[ -n "$__CACHE__CACHE__" ] && [ -w "$__CACHE__CACHE__" ] &&
+{
+# do we need flock here even while we are appending?
+# I think so in case "__CACHE__v" becomes longer.
+flock 1
+
+# Optimization left for future:	XXX TODO XXX
+# Truncate file $__CACHE__CACHE__ from the beginning a bit if it becomes too long?
+# This is easy, as entries are linebased usually.
+
+printf '__CACHE__C[%q]=%q;\n' "$1" "$__CACHE__v"
+} >> "$__CACHE__CACHE__"
+
+return 0
+}
+
+__CACHE__C()
+{
+local __CACHE__t
+printf -v __CACHE__t ' %q' "${@:2}"
+__CACHE__R "c$__CACHE__t" "$@"
+}
+
+__CACHE__T()
+{
+__CACHE__R "t$2" "$1" "${@:3}"
+}
+
+cacheC() { __CACHE__C "$@"; }
+cacheT() { __CACHE__T "$@"; }
+
