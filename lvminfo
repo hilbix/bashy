@@ -22,6 +22,7 @@ A==1  && NF==3 && $1=="pv" && $2=="name"		{ A++; pvname=$3; next }
 A==2  && NF==3 && $1=="vg" && $2=="name"		{ A++; vgname=$3; next }
 A==3  && NF==9 && $1=="pv" && $2=="size" && $4=="B" && $5=="/" && $6=="not" && $7=="usable" && $9=="B"	{ A++; pvsize=$3; pvwaste=$8; next }
 A==4  && NF==2 && $1=="allocatable"			{ A++; alloc=$2; next }
+A==4  && NF>2 && $1=="allocatable" && $3=="(But" && $4=="full)"	{ A++; alloc=$2",full"; next }
 A==5  && NF==4 && $1=="pe" && $2=="size" && $4=="B"	{ A++; pesize=$3; next }
 A==6  && NF==3 && $1=="total" && $2=="pe"		{ A++; petotal=$3; next }
 A==7  && NF==3 && $1=="free" && $2=="pe"		{ A++; pefree=$3; next }
