@@ -98,4 +98,7 @@ _Validname_() { case "$1" in (*[^A-Za-z0-9_]*);; ([A-Z_]*) return 0;; esac; retu
 _validName_() { case "$1" in (*[^A-Za-z0-9_]*);; ([a-z_]*) return 0;; esac; return 1; }
 _ValidName_() { case "$1" in (*[^A-Za-z0-9_]*);; ([a-zA-Z_]*) return 0;; esac; return 1; }
 
+# This does not check the length restriction of 63 characters
+_validasciidompart() { case "$1" in (*[^a-z0-9-]*|''|-*|*-|*--*--*|*---*);; (xn--*) return 0;; (*--*);; (*) return 0;; esac; return 1; }
+
 #EOF#
