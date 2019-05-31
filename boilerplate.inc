@@ -69,6 +69,18 @@ U() { unset -v "$@"; }
 V() { set -- $? "$@"; U "${@:4}"; printf -v "$2" "%s" "$3"; return $1; }	# see http://wiki.bash-hackers.org/commands/builtin/unset#unset2
 v() { local v; v="$(U v; "${@:2}"; STDOUT dummy)" || UNLESS x "$2" OOPS fail $?: "${@:2}"; v="${v%"${_BOILER_PREFIX_}dummy"}"; V "$1" "${v%$'\n'}" v; }
 
+# not good	o cmd args.. < file		o cmd args.. > file		o cmd args.. >> file
+# catch IOerr	o Reader file cmd args..	o Writer file cmd args..	o Appender file cmd args..
+# combined	o Reader input Writer output Writerr errorfile READER 4 anotherfile cmd args..
+Reader()	{       "${@:2}"   0<    "$1"; }	# stdin
+Writer()	{       "${@:2}"   1>    "$1"; }	# stdout write
+Appender()	{       "${@:2}"   1>>   "$1"; }	# stdout append
+Writerr()	{       "${@:2}"   2>    "$1"; }	# stderr write
+Appenderr()	{       "${@:2}"   2>>   "$1"; }	# stderr append
+READER()	{ eval '"${@:3}"' "$1<"  '"$2"'; }	# any read
+WRITER()	{ eval '"${@:3}"' "$1>"  '"$2"'; }	# any write
+APPENDER()	{ eval '"${@:3}"' "$1>>" '"$2"'; }	# any append
+
 # Simple tests
 _isALPHA() { case "$1" in '') return 1;; (*[^A-Z]*) return 1;; esac; return 0; }
 _isAlpha() { case "$1" in '') return 1;; (*[^a-zA-Z]*) return 1;; esac; return 0; }
