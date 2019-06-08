@@ -72,14 +72,15 @@ v() { local v; v="$(U v; "${@:2}"; STDOUT dummy)" || UNLESS x "$2" OOPS fail $?:
 # not good	o cmd args.. < file		o cmd args.. > file		o cmd args.. >> file
 # catch IOerr	o Reader file cmd args..	o Writer file cmd args..	o Appender file cmd args..
 # combined	o Reader input Writer output Writerr errorfile READER 4 anotherfile cmd args..
-Reader()	{       "${@:2}"   0<    "$1"; }	# stdin
-Writer()	{       "${@:2}"   1>    "$1"; }	# stdout write
-Appender()	{       "${@:2}"   1>>   "$1"; }	# stdout append
-Writerr()	{       "${@:2}"   2>    "$1"; }	# stderr write
-Appenderr()	{       "${@:2}"   2>>   "$1"; }	# stderr append
-READER()	{ eval '"${@:3}"' "$1<"  '"$2"'; }	# any read
-WRITER()	{ eval '"${@:3}"' "$1>"  '"$2"'; }	# any write
-APPENDER()	{ eval '"${@:3}"' "$1>>" '"$2"'; }	# any append
+Reader()	{          "${@:2}"   0<     "$1"; }	# stdin
+Writer()	{          "${@:2}"   1>     "$1"; }	# stdout write
+Appender()	{          "${@:2}"   1>>    "$1"; }	# stdout append
+Writerr()	{          "${@:2}"   2>     "$1"; }	# stderr write
+Appenderr()	{          "${@:2}"   2>>    "$1"; }	# stderr append
+READER()	{ eval -- '"${@:3}"' "$1<"  '"$2"'; }	# any read
+WRITER()	{ eval -- '"${@:3}"' "$1>"  '"$2"'; }	# any write
+APPENDER()	{ eval -- '"${@:3}"' "$1>>" '"$2"'; }	# any append
+
 
 # https://stackoverflow.com/a/47556292/490291
 _PASSBACK() { while [ 1 -lt $# ]; do printf '%q=%q;' "$1" "${!1}"; shift; done; return $1; }
@@ -101,33 +102,33 @@ CAPTURE() { eval "$(_CAPTURE "$@")"; }
 
 
 # Simple tests
-_isALPHA() { case "$1" in '') return 1;; (*[^A-Z]*) return 1;; esac; return 0; }
-_isAlpha() { case "$1" in '') return 1;; (*[^a-zA-Z]*) return 1;; esac; return 0; }
-_isalpha() { case "$1" in '') return 1;; (*[^a-z]*) return 1;; esac; return 0; }
+_isALPHA()    { case "$1" in	('')	return 1;;	(*[^A-Z]*)	return 1;;	esac; return 0; }
+_isAlpha()    { case "$1" in	('')	return 1;;	(*[^a-zA-Z]*)	return 1;;	esac; return 0; }
+_isalpha()    { case "$1" in	('')	return 1;;	(*[^a-z]*)	return 1;;	esac; return 0; }
 
-_isALPHA_() { case "$1" in '') return 1;; (*[^A-Z_]*) return 1;; esac; return 0; }
-_isAlpha_() { case "$1" in '') return 1;; (*[^a-zA-Z_]*) return 1;; esac; return 0; }
-_isalpha_() { case "$1" in '') return 1;; (*[^a-z_]*) return 1;; esac; return 0; }
+_isALPHA_()   { case "$1" in	('')	return 1;;	(*[^A-Z_]*)	return 1;;	esac; return 0; }
+_isAlpha_()   { case "$1" in	('')	return 1;;	(*[^a-zA-Z_]*)	return 1;;	esac; return 0; }
+_isalpha_()   { case "$1" in	('')	return 1;;	(*[^a-z_]*)	return 1;;	esac; return 0; }
 
-_isALNUM() { case "$1" in '') return 1;; (*[^A-Z0-9]*) return 1;; esac; return 0; }
-_isAlnum() { case "$1" in '') return 1;; (*[^a-zA-Z0-9]*) return 1;; esac; return 0; }
-_isalnum() { case "$1" in '') return 1;; (*[^a-z0-9]*) return 1;; esac; return 0; }
+_isALNUM()    { case "$1" in	('')	return 1;;	(*[^A-Z0-9]*)	return 1;;	esac; return 0; }
+_isAlnum()    { case "$1" in	('')	return 1;;	(*[^a-zA-Z0-9]*) return 1;;	esac; return 0; }
+_isalnum()    { case "$1" in	('')	return 1;;	(*[^a-z0-9]*)	return 1;;	esac; return 0; }
 
-_isALNUM_() { case "$1" in '') return 1;; (*[^A-Z0-9_]*) return 1;; esac; return 0; }
-_isAlnum_() { case "$1" in '') return 1;; (*[^a-zA-Z0-9_]*) return 1;; esac; return 0; }
-_isalnum_() { case "$1" in '') return 1;; (*[^a-z0-9_]*) return 1;; esac; return 0; }
+_isALNUM_()   { case "$1" in	('')	return 1;;	(*[^A-Z0-9_]*)	return 1;;	esac; return 0; }
+_isAlnum_()   { case "$1" in	('')	return 1;;	(*[^a-zA-Z0-9_]*) return 1;;	esac; return 0; }
+_isalnum_()   { case "$1" in	('')	return 1;;	(*[^a-z0-9_]*)	return 1;;	esac; return 0; }
 
-_validname() { case "$1" in (*[^a-z0-9]*);; ([a-z]*) return 0;; esac; return 1; }
-_VALIDNAME() { case "$1" in (*[^A-Z0-9]*);; ([A-Z]*) return 0;; esac; return 1; }
-_Validname() { case "$1" in (*[^A-Za-z0-9]*);; ([A-Z]*) return 0;; esac; return 1; }
-_validName() { case "$1" in (*[^A-Za-z0-9]*);; ([a-z]*) return 0;; esac; return 1; }
-_ValidName() { case "$1" in (*[^A-Za-z0-9]*);; ([a-zA-Z]*) return 0;; esac; return 1; }
+_validname()  { case "$1" in	(*[^a-z0-9]*)	;;	([a-z]*)	return 0;;	esac; return 1; }
+_VALIDNAME()  { case "$1" in	(*[^A-Z0-9]*)	;;	([A-Z]*)	return 0;;	esac; return 1; }
+_Validname()  { case "$1" in	(*[^A-Za-z0-9]*);;	([A-Z]*)	return 0;;	esac; return 1; }
+_validName()  { case "$1" in	(*[^A-Za-z0-9]*);;	([a-z]*)	return 0;;	esac; return 1; }
+_ValidName()  { case "$1" in	(*[^A-Za-z0-9]*);;	([a-zA-Z]*)	return 0;;	esac; return 1; }
 
-_validname_() { case "$1" in (*[^a-z0-9_]*);; ([a-z_]*) return 0;; esac; return 1; }
-_VALIDNAME_() { case "$1" in (*[^A-Z0-9_]*);; ([A-Z_]*) return 0;; esac; return 1; }
-_Validname_() { case "$1" in (*[^A-Za-z0-9_]*);; ([A-Z_]*) return 0;; esac; return 1; }
-_validName_() { case "$1" in (*[^A-Za-z0-9_]*);; ([a-z_]*) return 0;; esac; return 1; }
-_ValidName_() { case "$1" in (*[^A-Za-z0-9_]*);; ([a-zA-Z_]*) return 0;; esac; return 1; }
+_validname_() { case "$1" in	(*[^a-z0-9_]*)	;;	([a-z_]*)	return 0;;	esac; return 1; }
+_VALIDNAME_() { case "$1" in	(*[^A-Z0-9_]*)	;;	([A-Z_]*)	return 0;;	esac; return 1; }
+_Validname_() { case "$1" in	(*[^A-Za-z0-9_]*);;	([A-Z_]*)	return 0;;	esac; return 1; }
+_validName_() { case "$1" in	(*[^A-Za-z0-9_]*);;	([a-z_]*)	return 0;;	esac; return 1; }
+_ValidName_() { case "$1" in	(*[^A-Za-z0-9_]*);;	([a-zA-Z_]*)	return 0;;	esac; return 1; }
 
 # This does not check the length restriction of 63 characters
 _validasciidompart() { case "$1" in (*[^a-z0-9-]*|''|-*|*-|*--*--*|*---*);; (xn--*) return 0;; (*--*);; (*) return 0;; esac; return 1; }
