@@ -81,6 +81,25 @@ READER()	{ eval '"${@:3}"' "$1<"  '"$2"'; }	# any read
 WRITER()	{ eval '"${@:3}"' "$1>"  '"$2"'; }	# any write
 APPENDER()	{ eval '"${@:3}"' "$1>>" '"$2"'; }	# any append
 
+# https://stackoverflow.com/a/47556292/490291
+_PASSBACK() { while [ 1 -lt $# ]; do printf '%q=%q;' "$1" "${!1}"; shift; done; return $1; }
+PASSBACK() { _PASSBACK "$@" "$?"; }
+_CAPTURE() { { out="$("${@:2}" 3<&-; "$2_" >&3)"; ret=$?; printf "%q=%q;" "$1" "$out"; } 3>&1; echo "(exit $ret)"; }
+CAPTURE() { eval "$(_CAPTURE "$@")"; }
+#
+# Example use for a function which passes back two variables x and y
+#
+#fails_() { PASSBACK x y; }	# Annotate d() with what is passed back
+#fails() { x=$1; y=69; echo FAIL; return 23; }	# A naturally written function
+#
+# x=0
+# y=0
+# CAPTURE out fails
+# echo $? $x $y $out 42
+#
+# # outputs: 23 42 69 FAIL
+
+
 # Simple tests
 _isALPHA() { case "$1" in '') return 1;; (*[^A-Z]*) return 1;; esac; return 0; }
 _isAlpha() { case "$1" in '') return 1;; (*[^a-zA-Z]*) return 1;; esac; return 0; }
