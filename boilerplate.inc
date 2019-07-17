@@ -94,8 +94,8 @@ CAPTURE() { eval "$(_CAPTURE "$@")"; }
 #
 # x=0
 # y=0
-# CAPTURE out fails
-# echo $? $x $y $out 42
+# CAPTURE out fails 42
+# echo $? $x $y $out
 #
 # # outputs: 23 42 69 FAIL
 
