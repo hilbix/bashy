@@ -3,8 +3,10 @@
 love:	all
 
 all:
-	cd .src && for a in *; do ( cd "$$a" && git remote update -p && git ff "origin/$$a" ); done
+	git remote update -p && git ff origin/master
+	ok=:; cd .src && for a in *; do ( cd "$$a" && git remote update -p && git ff "origin/$$a" ) || ok=false; done; $$ok
 
 push:
-	cd .src && for a in *; do ( cd "$$a" && git push origin "HEAD:$$a" ); done
+	git push origin HEAD:master
+	ok=:; cd .src && for a in *; do ( cd "$$a" && git push origin "HEAD:$$a" ) || ok=false; done; $$ok
 
