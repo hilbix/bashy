@@ -1,6 +1,6 @@
 #
 
-love:	all
+love:	push all
 
 all:
 	git remote update -p && git ff origin/master
