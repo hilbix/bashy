@@ -65,9 +65,9 @@ O() { o "$@"; VERBOSE "$@"; }				# "O command args.." verbose o
 N() { o "$@"; NOTE "$@"; }				# "N command args.." noted o
 # v VAR cmd args..: set a variable to the output of the command (with error checking if "cmd" is not "x")
 # V VAR VAL LOCAL..: set VAR to VAL, taking back "local LOCAL..", not affecting $?
-U() { unset -v "$@"; }
-V() { set -- $? "$@"; U "${@:4}"; printf -v "$2" "%s" "$3"; return $1; }	# see http://wiki.bash-hackers.org/commands/builtin/unset#unset2
-v() { local v; v="$(U v; "${@:2}"; STDOUT dummy)" || UNLESS x "$2" OOPS fail $?: "${@:2}"; v="${v%"${_BOILER_PREFIX_}dummy"}"; V "$1" "${v%$'\n'}" v; }
+U() { unset -v -- "$@"; }	# see http://wiki.bash-hackers.org/commands/builtin/unset#unset2
+V() { set -- $? "$@"; U "${@:4}"; printf -v "$2" "%s" "$3"; return $1; }
+v() { local v; v="$(U v; "${@:2}"; STDOUT dummy)" || UNLESS x "$2" OOPS fail $?: "${@:2}"; set -- $? "$1" "${v%"${_BOILER_PREFIX_}dummy"}"; V "$2" "${3%$'\n'}" v; return $1; }
 
 # not good	o cmd args.. < file		o cmd args.. > file		o cmd args.. >> file
 # catch IOerr	o Reader file cmd args..	o Writer file cmd args..	o Appender file cmd args..
