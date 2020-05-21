@@ -54,9 +54,9 @@ ERR()     { STDERR "ERR${_BOILER_SUFFIX_}$?" "$@"; }
 # Fatals
 CALLER()  { local e="$(caller $((1+$1)))"; line="${e%% *}"; e="${e#* }"; file="${e#* }"; fn="${e%% *}"; }
 OOPS()    { STDERR "OOPS${_BOILER_SUFFIX_}" "$@"; exit 23; }
-INTERNAL() { CALLER "${1:-0}"; OOPS "$file" line "$line" INTERNAL ERROR in function "$fn" "${@:2}"; }
+INTERNAL() { CALLER "${1:-0}"; OOPS "$file:" line "$line:" INTERNAL ERROR in function "$fn" "${@:2}"; }
 INTERNAL1() { CALLER 0; INTERNAL 2 calling function "$fn"; }
-NOTYET() { CALLER "${1:-0}"; OOPS "$file" line "$line" not-yet-implemeted function "$fn" "${@:2}"; }
+NOTYET() { CALLER "${1:-0}"; OOPS "$file:" line "$line:" not-yet-implemeted function "$fn" "${@:2}"; }
 
 # Things to support error checking
 x() { DEBUG exec: "$@"; "$@"; DEBUG ret$?: "$@"; }	# "x command args.." allowed to fail
