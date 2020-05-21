@@ -34,7 +34,7 @@ declare -gr _BOILER_SUFFIX_="${3-$_BOILER_PREFIX_}"
 ### Variables
 ###
 
-declare -g _BOILER_DEBUG_=0 _BOILER_NO_NOTE_=0 _BOILER_VERBOSE_=0
+: "${_BOILER_DEBUG_:=0}${_BOILER_NO_NOTE_:=0}${_BOILER_VERBOSE_:=0}"
 
 ###
 ### ONELINERS
